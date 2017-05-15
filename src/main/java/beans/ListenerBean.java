@@ -17,9 +17,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 import javax.websocket.Session;
 import managers.ChallengeManager;
 import managers.SocketManager;
@@ -33,13 +30,12 @@ import models.ranjMessage;
  *
  * @author Luke
  */
-@WebListener
 @ApplicationScoped
-public class ListenerBean  implements ServletContextListener {
+public class ListenerBean {
 private static final Logger LOG = Logger.getLogger(SocketManager.class.getName());
     private static final Gson GSON = new Gson();
-    private ServletContext sc;
     private HashMap<String, String> connections = new HashMap<>();
+    private HashMap<String, Session> userSessions = new HashMap<>();
     ScriptEngineManager manager = new ScriptEngineManager();
     ScriptEngine engine;
 
@@ -49,14 +45,14 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
     CustomCodeBean ccb;
 
     public void SendToUser(String username, ranjMessage message) throws IOException {
-        if (getSessionByName(username) != null)
+        if (userSessions.containsKey(username))
         {
-            getSessionByName(username).getBasicRemote().sendText(GSON.toJson(message));
+            userSessions.get(username).getBasicRemote().sendText(GSON.toJson(message));
         }
         //TODO: Find way to implement searching user to find session and send message to this session.
     }
     
-    private ranjMessage relayIncoming(ranjMessage returnMessage, String message, Session session) {
+    public ranjMessage relayIncoming(ranjMessage returnMessage, String message, Session session) {
         try
         {
             ranjMessage rm = GSON.fromJson(message, ranjMessage.class);
@@ -85,8 +81,8 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
                     }
 
                     connections.put(session.getId(), ru.getUsername());
-                    addSessionByName(ru.getUsername(), session);
-                    System.out.println(getUserSessions().toString());
+                    userSessions.put(ru.getUsername(), session);
+                    System.out.println(userSessions.toString());
                     break;
                 case "IssueChallenge":
                     // For when custom code is found for this message, data put in scriptdata and scripterror on the Ranj class gets put in the return message.
@@ -204,40 +200,5 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
         }
         return returnMessage;
     }
-    
-    
-    
-    private Session getSessionByName(String name) {
-        return ((HashMap<String, Session>) sc.getAttribute("userSessions")).get(name);
-    }
 
-    private HashMap<String, Session> getUserSessions() {
-        return (HashMap<String, Session>) sc.getAttribute("userSessions");
-    }
-
-    private void addSessionByName(String name, Session session) {
-        if ((HashMap<String, Session>) sc.getAttribute("userSessions") == null)
-        {
-            HashMap<String, Session> userS = new HashMap<>();
-            userS.put(name, session);
-            sc.setAttribute("userSessions", userS);
-        }
-        else
-        {
-            ((HashMap<String, Session>) sc.getAttribute("userSessions")).put(name, session);
-        }
-
-    }
-    
-        @Override
-    public void contextDestroyed(ServletContextEvent event) {
-        chalM.GracefulShutdown();
-    }
-
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        sc = sce.getServletContext();
-        sc.setAttribute("userSessions", new HashMap<String, Session>());
-        // File loading is being done in CustomCodeBean so contextInitialized is being ignored here. Only need one central place to gracefully shut down the connections and save data.
-    }
 }
