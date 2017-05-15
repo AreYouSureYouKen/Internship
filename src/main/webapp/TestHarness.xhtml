@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>TODO supply a title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style type="text/css" media="screen">
+            .aceText { 
+                position: relative;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                width: 95%;
+                height:500px;
+            }
+            .returnText { 
+                position: relative;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                width: 95%;
+                height:500px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <h:form>
+            <h:outputLabel for="MessageClassTxt" value="Message Class: "></h:outputLabel><p:inputText id="MessageClassTxt" binding="#{messageClass}"> </p:inputText><br/>
+            <h:inputTextarea class="aceText" binding="#{messageBody}" id="Panel"></h:inputTextarea> 
+            <p:commandButton value="Send Message" action="#{testHarnessBean.SendMessage(messageClass.value, messageBody.value)}"></p:commandButton>
+            <br/><br/>
+            <h:outputLabel for="returnClassTxt" value="Message Class: "></h:outputLabel><p:inputText class="returnClass" id="returnClassTxt" value="#{testHarnessBean.returnMessage.messageClass}" disabled="true"></p:inputText><h:outputLabel for="returnTime" value="Time in ms: "></h:outputLabel><p:inputText class="returnClass" id="returnTime" value="#{testHarnessBean.milis}" disabled="true"></p:inputText> <br/><br/>
+            <h:outputLabel for="returnValueTxt" value="Message Body "></h:outputLabel><p:inputTextarea class="returnText" id="returnValueTxt" value="#{testHarnessBean.returnMessage.messageBody}" disabled="true"></p:inputTextarea><br/><br/>
+            <h:outputLabel for="returnErrorTxt" value="Message Error "></h:outputLabel><p:inputTextarea class="returnText" id="returnErrorTxt" value="#{testHarnessBean.returnMessage.messageError}" disabled="true"></p:inputTextarea><br/><br/>
+
+            <p:poll interval="2" update="returnValueTxt,returnClassTxt,returnErrorTxt,returnTime" autoStart="true"></p:poll>
+        </h:form>
+
+
+
+
+
+        <script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="src-noconflict/ext-language_tools.js" type="text/javascript" charset="utf-8" ></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            var useWebWorker = window.location.search.toLowerCase().indexOf('noworker') == - 1;
+            // Hook up ACE editor to all textareas with data-editor attribute
+            \$(document).ready(function () {
+            \$('.aceText').each(function () {
+            var textarea = $(this);
+            var editDiv = $('<div>', {
+            position: 'absolute',
+                    width: '100%',
+                    height: textarea.height(),
+                    'class': textarea.attr('class')}
+            , '</div>'
+                    ).insertBefore(textarea);
+            textarea.css('display', 'none');
+            var editor = ace.edit(editDiv[0]);
+            editor.renderer.setShowGutter(true);
+            editor.getSession().setValue(textarea.val());
+            editor.getSession().setMode("ace/mode/javascript");
+            editor.setTheme("ace/theme/monokai");
+            editor.$blockScrolling = Infinity;
+            ace.config.loadModule('ace/ext/tern', function() {
+            editor.setOptions({
+            enableTern: {
+            defs: ['browser', 'ecma5'],
+                    plugins: {
+                    doc_comment: {
+                    fullDocs: true
+                    }
+                    },
+                    useWorker: useWebWorker,
+                    startedCb: function () {
+                    //once tern is enabled, it can be accessed via editor.ternServer
+                    console.log('editor.ternServer:', editor.ternServer);
+                    },
+            },
+                    enableSnippets: true,
+                    enableBasicAutocompletion: true,
+            })
+            });
+            editor.getSession().on('change', function() {
+            textarea.val(editor.getSession().getValue());
+            })
+
+                    // copy back to textarea on form submit...
+                    textarea.closest('form').submit(function () {
+            textarea.val(editor.getSession().getValue());
+            })
+            });
+            });
+        </script>
+    </h:body>
+</html>

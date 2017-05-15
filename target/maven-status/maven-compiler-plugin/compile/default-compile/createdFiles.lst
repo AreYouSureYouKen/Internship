@@ -1,0 +1,12 @@
+beans\TestHarnessBean.class
+managers\MongoManager.class
+managers\ChallengeManager.class
+models\ranjMessage.class
+beans\CustomCodeBean.class
+models\ranjChallenge.class
+managers\SocketManager.class
+com\serverConfig.class
+managers\TestHarnessWSManager.class
+beans\TestHarnessBean$1.class
+models\ranj.class
+models\RanjUser.class
