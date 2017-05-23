@@ -8,6 +8,7 @@ package beans;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,8 +35,8 @@ import models.ranjMessage;
 public class ListenerBean {
 private static final Logger LOG = Logger.getLogger(SocketManager.class.getName());
     private static final Gson GSON = new Gson();
-    private HashMap<String, String> connections = new HashMap<>();
-    private HashMap<String, Session> userSessions = new HashMap<>();
+    private final HashMap<String, String> connections = new HashMap<>();
+    private final HashMap<String, Session> userSessions = new HashMap<>();
     ScriptEngineManager manager = new ScriptEngineManager();
     ScriptEngine engine;
 
@@ -61,7 +62,7 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
             {
                 // When a LoginMessage is fired, has little to no functionality other than adding the username and session ID to the connection map.
                 case "LoginMessage":
-                    RanjUser ru = GSON.fromJson(rm.getMessageBody(), RanjUser.class);
+                    RanjUser ru = GSON.fromJson(rm.getMessageBody().toString(), RanjUser.class);
                     LOG.log(Level.INFO, "Login request found with user {0}", ru.getUsername());
 
                     // For when custom code is found for this message, data put in scriptdata and scripterror on the Ranj class gets put in the return message.
@@ -115,6 +116,36 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
 
                     }
 
+                    break;
+                case "ListChallenges":
+                    if (ccb.ContainsListener(rm.getMessageClass()))
+                    {
+                        engine = manager.getEngineByName("nashorn");
+                        engine.put("Ranj", r);
+                        engine.eval(ccb.getListeners().get(rm.getMessageClass()));
+
+                        returnMessage.setMessageClass(rm.getMessageClass());
+                        // Wrap up the message, send added messages and fill the return message.
+                        returnMessage = wrapUp(returnMessage, r);
+
+                    }
+                    else
+                    {
+                        // No custom code found for issuing challenge so defaulting to automatic accepting of challenge on logged in player.
+                        if (connections.get(session.getId()) != null)
+                        {
+                            List<ranjChallenge> rcs = r.GetChallengesFromuser(message);
+                            returnMessage.setMessageClass(rm.getMessageClass());
+                            returnMessage.setMessageBody("List");
+                        }
+                        else
+                        {
+                            returnMessage.setMessageClass("NotLoggedIn");
+                            returnMessage.setMessageBody("Not-logged in user tried to issue a challenge");
+                            returnMessage.setMessageError("Unauthenticated connection");
+                        }
+
+                    }
                     break;
                 default:
                     returnMessage = checkListeners(rm, r, returnMessage);
@@ -178,11 +209,11 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
     private ranjMessage wrapUp(ranjMessage returnMessage, ranj r) throws IOException {
         if (!r.GetAllScriptData().isEmpty())
         {
-            returnMessage.setMessageBody(GSON.toJson(r.GetAllScriptData()));
+            returnMessage.setMessageBody(r.GetAllScriptData());
         }
         else
         {
-            returnMessage.setMessageError("No data for challenge found. ");
+            returnMessage.setMessageError("No data to be sent is found");
         }
 
         if (!r.getScriptError().isEmpty())

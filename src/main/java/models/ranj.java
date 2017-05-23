@@ -7,6 +7,7 @@ package models;
 
 import managers.ChallengeManager;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -55,7 +56,12 @@ public class ranj {
     }
 
     public ranjChallenge GetChallenge(String challengeId) {
-        return chalManager.findChallengeByID(challengeId);
+        return chalManager.FindChallengeByID(challengeId);
+    }
+    
+    public List<ranjChallenge> GetChallengesFromuser(String username)
+    {
+        return chalManager.FindChallengeByUser(username);
     }
 
     public ranjChallenge IssueChallenge(String playerID) {

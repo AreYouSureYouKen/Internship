@@ -26,7 +26,7 @@ public class ranjChallenge implements Serializable {
     private final long id;
     private String status;
     private final String shortCode;
-    private ArrayList<String> playerIDs;
+    private List<String> playerIDs;
     private String challengerID;
     private String playerTurn;
     private String winnerID;

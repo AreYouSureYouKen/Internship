@@ -78,11 +78,8 @@ public class SocketManager implements ServletContextListener {
 
         return GSON.toJson(returnMessage);
     }
-    
-    
-     
-    
-        @Override
+
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         chalM.GracefulShutdown();
     }

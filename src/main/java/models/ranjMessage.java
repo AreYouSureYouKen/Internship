@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public class ranjMessage implements Serializable{
     private String messageClass;
-    private String messageBody;
+    private Object messageBody;
     private String messageError;
     
     public ranjMessage()
@@ -21,14 +21,14 @@ public class ranjMessage implements Serializable{
         
     }
     
-    public ranjMessage(String messageClass, String messageBody)
+    public ranjMessage(String messageClass, Object messageBody)
     {
         this.messageClass = messageClass;
         this.messageBody = messageBody;
         this.messageError = "";
     }
     
-    public ranjMessage(String messageClass, String messageBody, String messageError)
+    public ranjMessage(String messageClass, Object messageBody, String messageError)
     {
         this.messageClass = messageClass;
         this.messageBody = messageBody;
@@ -52,14 +52,14 @@ public class ranjMessage implements Serializable{
     /**
      * @return the messageBody
      */
-    public String getMessageBody() {
+    public Object getMessageBody() {
         return messageBody;
     }
 
     /**
      * @param messageBody the messageBody to set
      */
-    public void setMessageBody(String messageBody) {
+    public void setMessageBody(Object messageBody) {
         this.messageBody = messageBody;
     }
 
