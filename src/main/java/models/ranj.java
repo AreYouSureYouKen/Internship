@@ -39,11 +39,11 @@ public class ranj {
     
 
     public RanjUser getUser() {
-        return null;
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     public RanjUser loadUser(String playerID) {
-        return null;
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     public ranjMessage GetData() {
@@ -61,7 +61,7 @@ public class ranj {
     
     public List<ranjChallenge> GetChallengesFromuser(String username)
     {
-        return chalManager.FindChallengeByUser(username);
+        return chalManager.FindChallengesByUser(username);
     }
 
     public ranjChallenge IssueChallenge(String playerID) {
@@ -89,21 +89,21 @@ public class ranj {
     /**
      * @return the scriptError
      */
-    public String getScriptError() {
+    public String GetScriptError() {
         return scriptError;
     }
 
     /**
      * @param scriptError the scriptError to set
      */
-    public void setScriptError(String scriptError) {
+    public void SetScriptError(String scriptError) {
         this.scriptError = scriptError;
     }
 
     /**
      * @return the messages
      */
-    public HashMap<String, ranjMessage> getMessages() {
+    public HashMap<String, ranjMessage> GetMessages() {
         return messages;
     }
 
@@ -111,7 +111,7 @@ public class ranj {
      * @param username the username this will be sent to
      * @param message the message that will be sent to user
      */
-    public void sendMessage(String username, ranjMessage message) {
+    public void SendMessage(String username, ranjMessage message) {
         this.messages.put(username, message);
     }
 }

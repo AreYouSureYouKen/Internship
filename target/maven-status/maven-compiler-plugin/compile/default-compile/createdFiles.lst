@@ -1,8 +1,10 @@
 beans\TestHarnessBean.class
 managers\MongoManager.class
 managers\ChallengeManager.class
+utility\Exclude.class
 com\serverConfig.class
 models\ranj.class
+utility\AnnotationExclusionStrategy.class
 models\ranjMessage.class
 beans\CustomCodeBean.class
 models\ranjChallenge.class

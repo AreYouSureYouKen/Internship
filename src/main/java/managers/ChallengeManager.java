@@ -5,7 +5,6 @@
  */
 package managers;
 
-import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -64,10 +63,15 @@ public class ChallengeManager {
         return challengeData.createQuery(ranjChallenge.class).field("challengeID").equalIgnoreCase(challengeID).get();
     }
     
-    public List<ranjChallenge> FindChallengeByUser(String username)
+    public List<ranjChallenge> FindChallengesByUser(String username)
     {
         CheckDBCon();
         return challengeData.createQuery(ranjChallenge.class).field("playerIDs").hasThisOne(username).asList();
+    }
+    
+    public AdvancedDatastore GetDataStore()
+    {
+        return challengeData;
     }
 
     /**
@@ -76,7 +80,7 @@ public class ChallengeManager {
      * @param filters
      * @return the first ranjChallenge containing the specified filters
      */
-    public ranjChallenge FindChallengeWithFilter(HashMap<String, Object> filters) {
+    public List<ranjChallenge> FindChallengeWithFilter(HashMap<String, Object> filters) {
         CheckDBCon();
         Query q = challengeData.createQuery(ranjChallenge.class);
         Set<Entry<String, Object>> entries = filters.entrySet();
@@ -85,7 +89,7 @@ public class ChallengeManager {
             q.filter(e.getKey(), e.getValue());
         }
 
-        return (ranjChallenge) q.get();
+        return (List<ranjChallenge>) q.asList();
     }
 
     private void CheckDBCon() {

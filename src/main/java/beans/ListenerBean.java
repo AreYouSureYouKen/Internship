@@ -6,6 +6,7 @@
 package beans;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import models.RanjUser;
 import models.ranj;
 import models.ranjChallenge;
 import models.ranjMessage;
+import utility.AnnotationExclusionStrategy;
 
 
 /**
@@ -34,7 +36,7 @@ import models.ranjMessage;
 @ApplicationScoped
 public class ListenerBean {
 private static final Logger LOG = Logger.getLogger(SocketManager.class.getName());
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setExclusionStrategies(new AnnotationExclusionStrategy()).create();
     private final HashMap<String, String> connections = new HashMap<>();
     private final HashMap<String, Session> userSessions = new HashMap<>();
     ScriptEngineManager manager = new ScriptEngineManager();
@@ -134,9 +136,9 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
                         // No custom code found for issuing challenge so defaulting to automatic accepting of challenge on logged in player.
                         if (connections.get(session.getId()) != null)
                         {
-                            List<ranjChallenge> rcs = r.GetChallengesFromuser(message);
+                            List<ranjChallenge> rcs = r.GetChallengesFromuser(connections.get(session.getId()));
                             returnMessage.setMessageClass(rm.getMessageClass());
-                            returnMessage.setMessageBody("List");
+                            returnMessage.setMessageBody(rcs);
                         }
                         else
                         {
@@ -216,15 +218,15 @@ private static final Logger LOG = Logger.getLogger(SocketManager.class.getName()
             returnMessage.setMessageError("No data to be sent is found");
         }
 
-        if (!r.getScriptError().isEmpty())
+        if (!r.GetScriptError().isEmpty())
         {
-            returnMessage.setMessageError(r.getScriptError());
+            returnMessage.setMessageError(r.GetScriptError());
         }
 
-        if (!r.getMessages().isEmpty())
+        if (!r.GetMessages().isEmpty())
         {
             System.out.println("found messages to send");
-            for (Map.Entry<String, ranjMessage> entry : r.getMessages().entrySet())
+            for (Map.Entry<String, ranjMessage> entry : r.GetMessages().entrySet())
             {
                 SendToUser(entry.getKey(), entry.getValue());
             }

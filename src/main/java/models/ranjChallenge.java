@@ -14,6 +14,7 @@ import java.util.Random;
 import javax.persistence.PrePersist;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import utility.Exclude;
 
 /**
  *
@@ -31,6 +32,7 @@ public class ranjChallenge implements Serializable {
     private String playerTurn;
     private String winnerID;
     private HashMap<String, Object> scriptData;
+    @Exclude
     private HashMap<String, Object> privateData;
     private Date lastUpdated;
 
